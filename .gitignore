@@ -1,0 +1,48 @@
+# ─── Node ───────────────────────────────────────
+node_modules/
+dist/
+lib/
+build/
+.turbo/
+
+# ─── Environment ────────────────────────────────
+.env
+.env.local
+.env.*.local
+!.env.example
+
+# ─── Firebase ───────────────────────────────────
+.firebase/
+firebase-debug.log
+firestore-debug.log
+ui-debug.log
+*.cache
+
+# ─── TypeScript ─────────────────────────────────
+*.tsbuildinfo
+
+# ─── Vite / Frontend ────────────────────────────
+frontend/.vite/
+frontend/dist/
+
+# ─── OS ─────────────────────────────────────────
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ─── IDE ─────────────────────────────────────────
+.vscode/settings.json
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+
+# ─── Logs ───────────────────────────────────────
+*.log
+npm-debug.log*
+pnpm-debug.log*
+
+# ─── Service account / secrets ──────────────────
+serviceAccountKey.json
+*-service-account.json

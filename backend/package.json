@@ -1,0 +1,32 @@
+﻿{
+  "name": "agentic-ai-backend",
+  "version": "1.0.0",
+  "description": "Express backend for Agentic AI Data Value Extractor",
+  "main": "dist/index.js",
+  "scripts": {
+    "dev": "tsx watch src/index.ts",
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "express": "^5.0.0",
+    "firebase-admin": "^12.0.0",
+    "@google/generative-ai": "^0.21.0",
+    "csv-parse": "^5.5.6",
+    "express-rate-limit": "^7.4.0",
+    "helmet": "^8.0.0",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "multer": "^1.4.5-lts.1",
+    "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "typescript": "^5.4.0",
+    "@types/express": "^5.0.0",
+    "@types/cors": "^2.8.17",
+    "@types/multer": "^1.4.11",
+    "@types/node": "^20.0.0",
+    "tsx": "^4.19.0"
+  }
+}

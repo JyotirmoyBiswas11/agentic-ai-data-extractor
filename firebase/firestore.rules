@@ -1,0 +1,73 @@
+﻿rules_version = '2';
+
+// Firestore security rules for database: pmtool
+// Only authenticated users can access their own data.
+// No public access is permitted at any path.
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ─── Helper Functions ───────────────────────────────────────────────────
+
+    // Returns true only when the caller is authenticated.
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    // Returns true when the caller owns the requested user document.
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+
+    // Validates that the incoming analysis document contains all required
+    // fields with the correct types.
+    function isValidAnalysis() {
+      let data = request.resource.data;
+      return
+        data.keys().hasAll(['status', 'createdAt', 'userId']) &&
+        data.status   is string &&
+        data.createdAt is timestamp &&
+        data.userId   is string &&
+        data.userId   == request.auth.uid;
+    }
+
+    // ─── Users collection ───────────────────────────────────────────────────
+    // Path: users/{userId}
+    match /users/{userId} {
+
+      // A user may read and update their own profile document.
+      allow read:   if isOwner(userId);
+      // Write is restricted to the owner; deletions are blocked entirely.
+      allow create: if isOwner(userId);
+      allow update: if isOwner(userId);
+      allow delete: if false;  // profiles are managed by Cloud Functions only
+
+      // ─── Analyses sub-collection ────────────────────────────────────────
+      // Path: users/{userId}/analyses/{analysisId}
+      match /analyses/{analysisId} {
+
+        // Owner may list / read individual analysis documents.
+        allow read:   if isOwner(userId);
+
+        // Owner may create a new analysis; validate required fields + types.
+        allow create: if isOwner(userId) && isValidAnalysis();
+
+        // Owner may update an existing analysis (e.g. rename, add notes).
+        // We re-validate on every write to prevent field-type corruption.
+        allow update: if isOwner(userId) && isValidAnalysis();
+
+        // Deletion is handled exclusively by Cloud Functions (backend cleanup).
+        allow delete: if false;
+      }
+
+      // ─── Catch-all: deny every other sub-collection ─────────────────────
+      match /{subcollection=**} {
+        allow read, write: if false;
+      }
+    }
+
+    // ─── Global catch-all: deny everything not matched above ────────────────
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

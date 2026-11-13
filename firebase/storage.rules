@@ -1,0 +1,51 @@
+﻿rules_version = '2';
+
+// Firebase Storage security rules for the Agentic AI Data Value Extractor.
+//
+// Policy summary:
+//   * Authenticated users may READ and WRITE (upload) only under their own
+//     prefix:  users/{userId}/uploads/{filename}
+//   * Maximum upload size: 10 MB
+//   * Allowed MIME types: text/csv  and  application/vnd.ms-excel
+//     (some CSV files are detected as the Excel MIME by the OS / browser)
+//   * DELETE is forbidden from the frontend — backend Cloud Functions handle
+//     storage cleanup after processing.
+service firebase.storage {
+  match /b/{bucket}/o {
+
+    // ─── User upload namespace ───────────────────────────────────────────────
+    match /users/{userId}/uploads/{filename} {
+
+      // ── Helper: caller owns this path ──────────────────────────────────────
+      function isOwner() {
+        return request.auth != null && request.auth.uid == userId;
+      }
+
+      // ── Helper: upload passes content-type + size checks ───────────────────
+      function isValidUpload() {
+        return
+          // 10 MB hard limit (10 * 1024 * 1024 bytes)
+          request.resource.size <= 10 * 1024 * 1024 &&
+          // Accept plain CSV or the Excel MIME that some OS / browsers emit
+          request.resource.contentType in [
+            'text/csv',
+            'application/vnd.ms-excel'
+          ];
+      }
+
+      // Authenticated owner may read their own files.
+      allow read:   if isOwner();
+
+      // Authenticated owner may upload a file that passes validation.
+      allow write:  if isOwner() && isValidUpload();
+
+      // Delete is NOT allowed from the client; Cloud Functions own cleanup.
+      allow delete: if false;
+    }
+
+    // ─── Global catch-all: deny everything else ──────────────────────────────
+    match /{allPaths=**} {
+      allow read, write, delete: if false;
+    }
+  }
+}
