@@ -97,9 +97,9 @@ cp .env.example .env
 Ensure `.env` contains:
 ```env
 FIREBASE_SERVICE_ACCOUNT='{...service-account-json...}'
-FIREBASE_PROJECT_ID=bigcommerce-widgets
-FIREBASE_DATABASE_ID=pmtool
-FIREBASE_STORAGE_BUCKET=bigcommerce-widgets.appspot.com
+FIREBASE_PROJECT_ID=my-demo-projects-43be2
+FIREBASE_DATABASE_ID=(default)
+FIREBASE_STORAGE_BUCKET=my-demo-projects-43be2.firebasestorage.app
 GEMINI_API_KEY=your_gemini_api_key_here
 PORT=8080
 FRONTEND_ORIGIN=http://localhost:5173
@@ -114,6 +114,7 @@ npm run dev
 ```bash
 cd frontend
 pnpm install
+cp .env.example .env
 pnpm dev
 ```
 The dashboard will run at `http://localhost:5173`.
@@ -156,6 +157,6 @@ gcloud run deploy agentic-ai-backend \
   --region us-central1 \
   --platform managed \
   --allow-unauthenticated \
-  --set-env-vars FIREBASE_PROJECT_ID=bigcommerce-widgets,FIREBASE_DATABASE_ID=pmtool,FIREBASE_STORAGE_BUCKET=bigcommerce-widgets.appspot.com \
+  --set-env-vars FIREBASE_PROJECT_ID=my-demo-projects-43be2,FIREBASE_DATABASE_ID=(default),FIREBASE_STORAGE_BUCKET=my-demo-projects-43be2.firebasestorage.app \
   --set-secrets GEMINI_API_KEY=gemini-api-key:latest,FIREBASE_SERVICE_ACCOUNT=firebase-service-account:latest
 ```

@@ -28,8 +28,8 @@ function initFirebase(): void {
 
   initializeApp({
     credential: cert(serviceAccount),
-    storageBucket: process.env['FIREBASE_STORAGE_BUCKET'] ?? 'bigcommerce-widgets.appspot.com',
-    databaseURL: 'https://bigcommerce-widgets-default-rtdb.firebaseio.com',
+    storageBucket: process.env['FIREBASE_STORAGE_BUCKET'] ?? 'my-demo-projects-43be2.firebasestorage.app',
+    databaseURL: process.env['FIREBASE_DATABASE_URL'] ?? 'https://my-demo-projects-43be2-default-rtdb.firebaseio.com',
   });
 
   console.log('[Firebase] Admin SDK initialised.');
@@ -47,8 +47,8 @@ app.use(helmet());
 // CORS — whitelist the frontend origins
 const allowedOrigins = new Set([
   process.env['FRONTEND_ORIGIN'] ?? 'http://localhost:5173',
-  'https://bigcommerce-widgets.web.app',
-  'https://bigcommerce-widgets.firebaseapp.com',
+  'https://my-demo-projects-43be2.web.app',
+  'https://my-demo-projects-43be2.firebaseapp.com',
 ]);
 
 app.use(

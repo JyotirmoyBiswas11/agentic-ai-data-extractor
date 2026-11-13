@@ -1,9 +1,9 @@
 # ─── Node ───────────────────────────────────────
 node_modules/
 dist/
-lib/
 build/
 .turbo/
+firebase/functions/lib/
 
 # ─── Environment ────────────────────────────────
 .env

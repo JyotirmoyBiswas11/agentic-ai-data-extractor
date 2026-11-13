@@ -1,10 +1,10 @@
 import { getFirestore, FieldValue } from 'firebase-admin/firestore';
 import type { AnalysisDocument, AnalysisResult, AnalysisStatus } from '../types/index.js';
 
-/** Returns the Firestore instance pointing to the pmtool database. */
+/** Returns the Firestore instance pointing to the configured database. */
 function getDb(): FirebaseFirestore.Firestore {
-  const dbId = process.env['FIREBASE_DATABASE_ID'] ?? 'pmtool';
-  return getFirestore(dbId);
+  const dbId = process.env['FIREBASE_DATABASE_ID'];
+  return dbId && dbId !== '(default)' ? getFirestore(dbId) : getFirestore();
 }
 
 /** Returns a typed DocumentReference for a user's analysis document. */
