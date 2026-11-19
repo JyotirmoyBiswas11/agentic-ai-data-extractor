@@ -64,7 +64,7 @@ export interface AnalysisDocument {
   id: string;
   uid: string;
   fileName: string;
-  storagePath: string;
+  storagePath?: string; // Optional — not used when file is sent directly to backend
   status: AnalysisStatus;
   errorMessage?: string;
   rowCount: number;

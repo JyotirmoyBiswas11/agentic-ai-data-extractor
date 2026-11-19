@@ -1,9 +1,6 @@
 import React, { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Papa from 'papaparse';
-import { nanoid } from 'nanoid';
-import { ref, uploadBytesResumable } from 'firebase/storage';
-import { storage } from '../../lib/firebase';
 import { useAuth } from '../../hooks/useAuth';
 import { api } from '../../lib/api';
 import { formatFileSize } from '../../lib/utils';
@@ -25,7 +22,6 @@ export const FileUpload: React.FC = () => {
   const [file, setFile] = useState<File | null>(null);
   const [previewRows, setPreviewRows] = useState<Record<string, string>[]>([]);
   const [headers, setHeaders] = useState<string[]>([]);
-  const [uploadProgress, setUploadProgress] = useState<number>(0);
   const [isProcessing, setIsProcessing] = useState(false);
   const [statusMessage, setStatusMessage] = useState<string>('');
   const [error, setError] = useState<string | null>(null);
@@ -45,7 +41,7 @@ export const FileUpload: React.FC = () => {
 
     setFile(selectedFile);
 
-    // Quick client-side parse for preview
+    // Quick client-side parse for preview only
     Papa.parse(selectedFile, {
       header: true,
       preview: 5,
@@ -86,50 +82,17 @@ export const FileUpload: React.FC = () => {
 
     setIsProcessing(true);
     setError(null);
-    setStatusMessage('Uploading CSV dataset to secure Cloud Storage...');
+    setStatusMessage('Sending CSV to analysis pipeline...');
 
     try {
-      const analysisId = `analysis_${nanoid(10)}`;
-      const storagePath = `users/${user.uid}/uploads/${analysisId}.csv`;
-      const storageRef = ref(storage, storagePath);
+      // Send the file directly to Express backend as multipart/form-data.
+      // No Firebase Storage involved — backend parses in-memory and runs Gemini.
+      const { analysisId } = await api.uploadAndAnalyze(file);
 
-      const uploadTask = uploadBytesResumable(storageRef, file, {
-        contentType: 'text/csv',
-      });
-
-      uploadTask.on(
-        'state_changed',
-        (snapshot) => {
-          const progress = Math.round(
-            (snapshot.bytesTransferred / snapshot.totalBytes) * 100
-          );
-          setUploadProgress(progress);
-        },
-        (uploadErr) => {
-          setIsProcessing(false);
-          setError(`Upload failed: ${uploadErr.message}`);
-        },
-        async () => {
-          // Upload complete! Now trigger Express backend AI Agent
-          setStatusMessage('Initiating Agentic AI analysis pipeline...');
-          try {
-            await api.triggerAnalysis({
-              storagePath,
-              analysisId,
-              fileName: file.name,
-            });
-
-            setStatusMessage('Analysis queued successfully! Redirecting...');
-            setTimeout(() => {
-              navigate(`/analyses/${analysisId}`);
-            }, 800);
-          } catch (triggerErr: unknown) {
-            setIsProcessing(false);
-            const msg = triggerErr instanceof Error ? triggerErr.message : 'Backend error';
-            setError(`Failed to trigger analysis: ${msg}`);
-          }
-        }
-      );
+      setStatusMessage('Analysis queued! Redirecting to results...');
+      setTimeout(() => {
+        navigate(`/analyses/${analysisId}`);
+      }, 800);
     } catch (err: unknown) {
       setIsProcessing(false);
       const msg = err instanceof Error ? err.message : 'Unexpected error';
@@ -141,7 +104,6 @@ export const FileUpload: React.FC = () => {
     setFile(null);
     setPreviewRows([]);
     setHeaders([]);
-    setUploadProgress(0);
     setError(null);
     if (fileInputRef.current) {
       fileInputRef.current.value = '';
@@ -198,7 +160,7 @@ export const FileUpload: React.FC = () => {
             Drag & drop your enterprise dataset here, or click to browse. Max size 10 MB.
           </p>
           <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[var(--secondary)] text-[var(--muted-foreground)] text-[11px] font-medium">
-            <span>Supported: Clean or Unstructured Sales, Analytics, CRM records</span>
+            <span>Supported: Sales, Analytics, CRM, and other CSV records</span>
           </div>
         </div>
       ) : (
@@ -237,7 +199,7 @@ export const FileUpload: React.FC = () => {
                   <span>Previewing First 5 Rows</span>
                 </div>
                 <span className="text-[11px] text-[var(--muted-foreground)]">
-                  Gemini will analyze full dataset rows
+                  Gemini will analyze the full dataset
                 </span>
               </div>
               <div className="overflow-x-auto">
@@ -270,26 +232,20 @@ export const FileUpload: React.FC = () => {
             </div>
           )}
 
-          {/* Upload Progress Bar if processing */}
+          {/* Processing status */}
           {isProcessing && (
             <div className="p-5 rounded-2xl border border-[var(--primary)]/30 bg-[var(--primary)]/5 space-y-3">
-              <div className="flex items-center justify-between text-xs font-medium">
-                <span className="text-[var(--text)] flex items-center gap-2">
-                  <Loader2 className="w-4 h-4 animate-spin text-[var(--accent)]" />
-                  {statusMessage}
-                </span>
-                <span className="font-mono text-[var(--primary)] font-bold">{uploadProgress}%</span>
+              <div className="flex items-center gap-3 text-xs font-medium text-[var(--text)]">
+                <Loader2 className="w-4 h-4 animate-spin text-[var(--accent)]" />
+                <span>{statusMessage}</span>
               </div>
-              <div className="w-full h-2 rounded-full bg-[var(--border)] overflow-hidden">
-                <div
-                  className="h-full bg-gradient-to-r from-[var(--primary)] to-[var(--accent)] transition-all duration-300"
-                  style={{ width: `${uploadProgress}%` }}
-                />
-              </div>
+              <p className="text-[11px] text-[var(--muted-foreground)]">
+                Gemini AI is running schema detection → quality analysis → KPI extraction → chart synthesis…
+              </p>
             </div>
           )}
 
-          {/* Action Button */}
+          {/* Action Buttons */}
           {!isProcessing && (
             <div className="flex justify-end gap-3">
               <button

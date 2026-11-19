@@ -22,14 +22,13 @@ function analysisRef(uid: string, analysisId: string): FirebaseFirestore.Documen
 export async function createAnalysis(
   uid: string,
   analysisId: string,
-  data: Pick<AnalysisDocument, 'fileName' | 'storagePath' | 'rowCount' | 'columnCount'>,
+  data: Pick<AnalysisDocument, 'fileName' | 'rowCount' | 'columnCount'>,
 ): Promise<void> {
   await analysisRef(uid, analysisId).set({
     id: analysisId,
     uid,
     userId: uid, // duplicate for Firestore rules compatibility
     fileName: data.fileName,
-    storagePath: data.storagePath,
     status: 'pending' as AnalysisStatus,
     rowCount: data.rowCount,
     columnCount: data.columnCount,

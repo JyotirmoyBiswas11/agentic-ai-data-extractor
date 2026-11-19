@@ -59,9 +59,6 @@ export const Navbar: React.FC = () => {
                 <p className="text-xs font-medium text-[var(--text)] truncate max-w-[140px]">
                   {profile?.displayName || user.email?.split('@')[0]}
                 </p>
-                <p className="text-[10px] text-[var(--muted-foreground)] capitalize">
-                  {profile?.plan || 'Free'} Plan
-                </p>
               </div>
             </div>
 

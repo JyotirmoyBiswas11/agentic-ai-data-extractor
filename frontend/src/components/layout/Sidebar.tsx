@@ -5,8 +5,6 @@ import {
   LayoutDashboard,
   UploadCloud,
   FileSpreadsheet,
-  ShieldCheck,
-  Database,
   Sparkles,
 } from 'lucide-react';
 
@@ -49,40 +47,6 @@ export const Sidebar: React.FC = () => {
             );
           })}
         </nav>
-
-        {/* Feature Highlight Card */}
-        <div className="p-3.5 rounded-xl border border-[var(--primary)]/20 bg-gradient-to-b from-[var(--primary)]/5 to-transparent relative overflow-hidden">
-          <div className="flex items-center gap-2 mb-1.5 text-[var(--accent)] font-medium text-xs">
-            <Sparkles className="w-3.5 h-3.5" />
-            <span>Agentic Engine</span>
-          </div>
-          <p className="text-[11px] text-[var(--muted-foreground)] leading-relaxed">
-            Gemini multi-stage pipeline auto-detects column schemas, cleans anomalies, and generates KPIs.
-          </p>
-        </div>
-      </div>
-
-      {/* System Status Footprint */}
-      <div className="p-4 border-t border-[var(--border)] space-y-2">
-        <div className="flex items-center justify-between text-[11px] text-[var(--muted-foreground)]">
-          <div className="flex items-center gap-1.5">
-            <ShieldCheck className="w-3.5 h-3.5 text-emerald-500" />
-            <span>App Check</span>
-          </div>
-          <span className="font-mono text-[10px] text-emerald-500 font-semibold bg-emerald-500/10 px-1.5 py-0.5 rounded">
-            Enforced
-          </span>
-        </div>
-
-        <div className="flex items-center justify-between text-[11px] text-[var(--muted-foreground)]">
-          <div className="flex items-center gap-1.5">
-            <Database className="w-3.5 h-3.5 text-cyan-500" />
-            <span>Firestore DB</span>
-          </div>
-          <span className="font-mono text-[10px] text-cyan-500 font-semibold bg-cyan-500/10 px-1.5 py-0.5 rounded">
-            pmtool
-          </span>
-        </div>
       </div>
     </aside>
   );
