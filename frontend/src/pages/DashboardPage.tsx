@@ -152,7 +152,7 @@ export const DashboardPage: React.FC = () => {
         {isLoading ? (
           <div className="p-12 text-center text-xs text-[var(--muted-foreground)] flex items-center justify-center gap-2">
             <Loader2 className="w-4 h-4 animate-spin text-[var(--primary)]" />
-            <span>Fetching analyses from pmtool...</span>
+            <span>Loading analyses...</span>
           </div>
         ) : analyses.length === 0 ? (
           <div className="p-12 text-center space-y-3">

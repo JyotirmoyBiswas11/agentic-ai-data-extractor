@@ -27,7 +27,7 @@ export const AnalysisDetailPage: React.FC = () => {
           Connecting to Analysis Pipeline...
         </h3>
         <p className="text-xs text-[var(--muted-foreground)]">
-          Listening for updates from Firestore pmtool database
+          Connecting to analysis pipeline...
         </p>
       </div>
     );

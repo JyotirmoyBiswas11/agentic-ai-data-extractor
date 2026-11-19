@@ -8,7 +8,7 @@ import type {
   DataQualityReport,
 } from '../types/index.js';
 
-// ─── Client initialisation ─────────────────────────────────────────────────
+// ─── Client initialisation ───────────────────────────────────────────────────
 
 function getGeminiClient(): GoogleGenerativeAI {
   const apiKey = process.env['GEMINI_API_KEY'];
@@ -16,9 +16,9 @@ function getGeminiClient(): GoogleGenerativeAI {
   return new GoogleGenerativeAI(apiKey);
 }
 
-function getModel(client: GoogleGenerativeAI) {
+function getJsonModel(client: GoogleGenerativeAI, modelName: string) {
   return client.getGenerativeModel({
-    model: 'gemini-1.5-flash',
+    model: modelName,
     generationConfig: {
       responseMimeType: 'application/json',
       temperature: 0.2, // low temperature for consistent structured output
@@ -26,7 +26,16 @@ function getModel(client: GoogleGenerativeAI) {
   });
 }
 
-// ─── JSON parsing helper ───────────────────────────────────────────────────
+function getTextModel(client: GoogleGenerativeAI, modelName: string) {
+  return client.getGenerativeModel({
+    model: modelName,
+    generationConfig: {
+      temperature: 0.3,
+    },
+  });
+}
+
+// ─── JSON parsing helper ─────────────────────────────────────────────────────
 
 function safeParseJSON<T>(text: string): T {
   try {
@@ -43,10 +52,10 @@ function safeParseJSON<T>(text: string): T {
   }
 }
 
-// ─── Step 1: Column metadata analysis ─────────────────────────────────────
+// ─── Step 1: Column metadata analysis ───────────────────────────────────────
 
 async function analyzeColumns(
-  model: ReturnType<typeof getModel>,
+  model: ReturnType<typeof getJsonModel>,
   csv: ParsedCSV,
 ): Promise<ColumnMeta[]> {
   const sampleRows = csv.rows.slice(0, 10);
@@ -68,10 +77,10 @@ Return only the JSON array.`;
   return safeParseJSON<ColumnMeta[]>(result.response.text());
 }
 
-// ─── Step 2: Data quality analysis ────────────────────────────────────────
+// ─── Step 2: Data quality analysis ──────────────────────────────────────────
 
 async function analyzeDataQuality(
-  model: ReturnType<typeof getModel>,
+  model: ReturnType<typeof getJsonModel>,
   csv: ParsedCSV,
   columnMeta: ColumnMeta[],
 ): Promise<DataQualityReport> {
@@ -105,14 +114,13 @@ Return only the JSON object.`;
   return safeParseJSON<DataQualityReport>(result.response.text());
 }
 
-// ─── Step 3: KPI extraction ────────────────────────────────────────────────
+// ─── Step 3: KPI extraction ─────────────────────────────────────────────────
 
 async function extractKPIs(
-  model: ReturnType<typeof getModel>,
+  model: ReturnType<typeof getJsonModel>,
   csv: ParsedCSV,
   columnMeta: ColumnMeta[],
 ): Promise<KPI[]> {
-  // Limit to 500 rows for Gemini context window
   const rows = csv.rows.slice(0, 500);
   const prompt = `You are a business intelligence analyst. Extract the most important KPIs from this dataset.
 
@@ -141,10 +149,10 @@ Return only the JSON array.`;
   return safeParseJSON<KPI[]>(result.response.text());
 }
 
-// ─── Step 4: Chart generation ──────────────────────────────────────────────
+// ─── Step 4: Chart generation ───────────────────────────────────────────────
 
 async function generateCharts(
-  model: ReturnType<typeof getModel>,
+  model: ReturnType<typeof getJsonModel>,
   csv: ParsedCSV,
   columnMeta: ColumnMeta[],
   kpis: KPI[],
@@ -179,10 +187,10 @@ Return only the JSON array.`;
   return safeParseJSON<ChartSpec[]>(result.response.text());
 }
 
-// ─── Step 5: Executive summary ─────────────────────────────────────────────
+// ─── Step 5: Executive summary ──────────────────────────────────────────────
 
 async function generateSummary(
-  model: ReturnType<typeof getModel>,
+  model: ReturnType<typeof getTextModel>,
   kpis: KPI[],
   dataQuality: DataQualityReport,
   fileName: string,
@@ -197,38 +205,78 @@ Write exactly 2–3 sentences summarising the most important findings. Use speci
 Return only the plain text summary — no JSON, no markdown formatting.`;
 
   const result = await model.generateContent(prompt);
-  return result.response.text().trim();
+  let text = result.response.text().trim();
+  try {
+    const parsed = JSON.parse(text);
+    if (typeof parsed === 'string') text = parsed;
+    if (parsed && typeof parsed.summary === 'string') text = parsed.summary;
+  } catch {
+    // Already plain text
+  }
+  return text;
 }
 
-// ─── Main agent orchestrator ───────────────────────────────────────────────
+// ─── Main agent orchestrator ─────────────────────────────────────────────────
 
 /**
  * Runs the full multi-step AI analysis pipeline on a parsed CSV dataset.
  * Steps: column analysis → data quality → KPI extraction → chart generation → summary.
+ * Automatically tries candidate models (starting with gemini-2.0-flash) if one fails with 404.
  */
 export async function runAnalysisAgent(
   csv: ParsedCSV,
   fileName: string,
 ): Promise<AnalysisResult> {
   const client = getGeminiClient();
-  const model = getModel(client);
 
-  console.log(`[GeminiAgent] Starting analysis — file: "${fileName}", rows: ${csv.rowCount}`);
+  const candidateModels = [
+    process.env['GEMINI_MODEL'],
+    'gemini-2.5-flash',
+    'gemini-2.0-flash',
+    'gemini-1.5-flash-latest',
+    'gemini-1.5-pro',
+    'gemini-1.5-flash',
+  ].filter(Boolean) as string[];
 
-  const columnMeta = await analyzeColumns(model, csv);
-  console.log(`[GeminiAgent] ✓ Column analysis — ${columnMeta.length} columns`);
+  let lastError: unknown;
 
-  const dataQuality = await analyzeDataQuality(model, csv, columnMeta);
-  console.log(`[GeminiAgent] ✓ Data quality — score: ${dataQuality.overallScore}/100`);
+  for (const modelName of candidateModels) {
+    try {
+      console.log(`[GeminiAgent] Initiating analysis with model: "${modelName}"...`);
+      const jsonModel = getJsonModel(client, modelName);
+      const textModel = getTextModel(client, modelName);
 
-  const kpis = await extractKPIs(model, csv, columnMeta);
-  console.log(`[GeminiAgent] ✓ KPI extraction — ${kpis.length} KPIs`);
+      const columnMeta = await analyzeColumns(jsonModel, csv);
+      console.log(`[GeminiAgent] ✓ Column analysis — ${columnMeta.length} columns (verified active model: "${modelName}")`);
 
-  const charts = await generateCharts(model, csv, columnMeta, kpis);
-  console.log(`[GeminiAgent] ✓ Chart generation — ${charts.length} charts`);
+      const dataQuality = await analyzeDataQuality(jsonModel, csv, columnMeta);
+      console.log(`[GeminiAgent] ✓ Data quality — score: ${dataQuality.overallScore}/100`);
 
-  const summary = await generateSummary(model, kpis, dataQuality, fileName);
-  console.log('[GeminiAgent] ✓ Summary generated');
+      const kpis = await extractKPIs(jsonModel, csv, columnMeta);
+      console.log(`[GeminiAgent] ✓ KPI extraction — ${kpis.length} KPIs`);
 
-  return { kpis, charts, dataQuality, columnMetadata: columnMeta, summary };
+      const charts = await generateCharts(jsonModel, csv, columnMeta, kpis);
+      console.log(`[GeminiAgent] ✓ Chart generation — ${charts.length} charts`);
+
+      const summary = await generateSummary(textModel, kpis, dataQuality, fileName);
+      console.log('[GeminiAgent] ✓ Summary generated');
+
+      return { kpis, charts, dataQuality, columnMetadata: columnMeta, summary };
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : String(err);
+      if (
+        msg.includes('404') ||
+        msg.includes('not found') ||
+        msg.includes('not supported') ||
+        msg.includes('is not found for API version')
+      ) {
+        console.warn(`[GeminiAgent] Model "${modelName}" not available on this API tier (${msg.substring(0, 90)}...). Retrying with next candidate...`);
+        lastError = err;
+        continue;
+      }
+      throw err;
+    }
+  }
+
+  throw lastError || new Error('All candidate Gemini models failed.');
 }

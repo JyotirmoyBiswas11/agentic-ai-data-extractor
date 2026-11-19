@@ -22,7 +22,7 @@ export function useAuth() {
         return;
       }
 
-      // Listen to Firestore profile updates (pmtool database)
+      // Listen to Firestore profile updates
       const userDocRef = doc(db, 'users', currentUser.uid);
       const unsubscribeDoc = onSnapshot(
         userDocRef,

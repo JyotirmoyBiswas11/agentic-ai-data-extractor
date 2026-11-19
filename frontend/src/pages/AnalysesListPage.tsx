@@ -77,7 +77,7 @@ export const AnalysesListPage: React.FC = () => {
         {isLoading ? (
           <div className="p-16 text-center text-xs text-[var(--muted-foreground)] flex items-center justify-center gap-2">
             <Loader2 className="w-4 h-4 animate-spin text-[var(--primary)]" />
-            <span>Loading analyses from pmtool database...</span>
+            <span>Loading analyses...</span>
           </div>
         ) : filteredAnalyses.length === 0 ? (
           <div className="p-16 text-center space-y-3">

@@ -17,7 +17,7 @@ export const AppShell: React.FC = () => {
           <Loader2 className="w-6 h-6 text-[var(--primary)] absolute" />
         </div>
         <p className="mt-4 text-sm font-medium text-[var(--muted-foreground)] tracking-wide animate-pulse">
-          Authenticating with App Check...
+          Authenticating ...
         </p>
       </div>
     );

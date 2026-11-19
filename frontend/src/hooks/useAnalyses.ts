@@ -1,8 +1,6 @@
 import { useEffect } from 'react';
 import {
   collection,
-  query,
-  orderBy,
   onSnapshot,
   doc,
 } from 'firebase/firestore';
@@ -32,27 +30,47 @@ export function useAnalyses() {
     }
 
     setIsLoading(true);
+
+    // Safeguard timeout: ensure UI stops spinning even if Firestore network takes long
+    const timeout = setTimeout(() => {
+      setIsLoading(false);
+    }, 3500);
+
     const analysesRef = collection(db, 'users', user.uid, 'analyses');
-    const q = query(analysesRef, orderBy('createdAt', 'desc'));
 
     const unsubscribe = onSnapshot(
-      q,
+      analysesRef,
       (snapshot) => {
+        clearTimeout(timeout);
         const docs: AnalysisDocument[] = snapshot.docs.map((item) => ({
           ...(item.data() as AnalysisDocument),
           id: item.id,
         }));
+
+        // Sort latest first in memory (avoids composite index requirement)
+        docs.sort((a, b) => {
+          const rawA = a.createdAt as unknown as { toMillis?: () => number; seconds?: number } | undefined;
+          const rawB = b.createdAt as unknown as { toMillis?: () => number; seconds?: number } | undefined;
+          const timeA = rawA?.toMillis?.() ?? (rawA?.seconds ? rawA.seconds * 1000 : 0);
+          const timeB = rawB?.toMillis?.() ?? (rawB?.seconds ? rawB.seconds * 1000 : 0);
+          return timeB - timeA;
+        });
+
         setAnalyses(docs);
         setIsLoading(false);
       },
       (err) => {
+        clearTimeout(timeout);
         console.error('[useAnalyses] Failed to fetch analyses:', err);
         setError(err.message);
         setIsLoading(false);
       }
     );
 
-    return () => unsubscribe();
+    return () => {
+      clearTimeout(timeout);
+      unsubscribe();
+    };
   }, [user, setAnalyses, setIsLoading, setError]);
 
   return {
