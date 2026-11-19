@@ -37,7 +37,21 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onSuccess, onSwitchToRegis
       await login(data.email, data.password);
       if (onSuccess) onSuccess();
     } catch (err: unknown) {
-      const message = err instanceof Error ? err.message : 'Failed to sign in. Please check your credentials.';
+      let message = 'Failed to sign in. Please check your credentials.';
+      if (err && typeof err === 'object' && 'code' in err) {
+        const code = (err as { code: string }).code;
+        if (code === 'auth/operation-not-allowed') {
+          message = 'Email/Password sign-in is not enabled in Firebase Console. Please enable it in Authentication > Sign-in method.';
+        } else if (code === 'auth/user-not-found' || code === 'auth/wrong-password' || code === 'auth/invalid-credential') {
+          message = 'Invalid email or password. Please verify your credentials.';
+        } else if (code === 'auth/user-disabled') {
+          message = 'This account has been disabled.';
+        } else if ('message' in err && typeof err.message === 'string') {
+          message = err.message;
+        }
+      } else if (err instanceof Error) {
+        message = err.message;
+      }
       setError(message);
     } finally {
       setIsLoading(false);

@@ -43,7 +43,23 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({ onSuccess, onSwitchT
       await registerUser(data.email, data.password);
       if (onSuccess) onSuccess();
     } catch (err: unknown) {
-      const message = err instanceof Error ? err.message : 'Registration failed. Please check your details.';
+      let message = 'Registration failed. Please check your details.';
+      if (err && typeof err === 'object' && 'code' in err) {
+        const code = (err as { code: string }).code;
+        if (code === 'auth/operation-not-allowed') {
+          message = 'Email/Password sign-in is not enabled in Firebase Console. Please enable it in Authentication > Sign-in method.';
+        } else if (code === 'auth/email-already-in-use') {
+          message = 'An account with this email already exists. Please sign in.';
+        } else if (code === 'auth/weak-password') {
+          message = 'The password is too weak. Please use at least 8 characters.';
+        } else if (code === 'auth/invalid-email') {
+          message = 'The email address format is invalid.';
+        } else if ('message' in err && typeof err.message === 'string') {
+          message = err.message;
+        }
+      } else if (err instanceof Error) {
+        message = err.message;
+      }
       setError(message);
     } finally {
       setIsLoading(false);
