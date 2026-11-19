@@ -5,17 +5,29 @@ build/
 .turbo/
 firebase/functions/lib/
 
-# ─── Environment ────────────────────────────────
+# ─── Environment & Secrets ──────────────────────
 .env
+.env.*
 .env.local
 .env.*.local
 !.env.example
+*.env
+service-account*.json
+*service-account*.json
+serviceAccountKey*.json
+*serviceAccountKey*.json
+*-credentials.json
+credentials*.json
+*.pem
+*.key
+prepare-env*.mjs
+prepare-env*.js
 
 # ─── Firebase ───────────────────────────────────
 .firebase/
-firebase-debug.log
-firestore-debug.log
-ui-debug.log
+firebase-debug.log*
+firestore-debug.log*
+ui-debug.log*
 *.cache
 
 # ─── TypeScript ─────────────────────────────────
@@ -42,7 +54,5 @@ desktop.ini
 *.log
 npm-debug.log*
 pnpm-debug.log*
-
-# ─── Service account / secrets ──────────────────
-serviceAccountKey.json
-*-service-account.json
+yarn-debug.log*
+yarn-error.log*

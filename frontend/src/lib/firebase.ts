@@ -19,7 +19,7 @@ export const app = initializeApp(firebaseConfig);
 // Enforce App Check with ReCaptchaV3Provider (no debug token)
 const recaptchaSiteKey = import.meta.env.VITE_FIREBASE_RECAPTCHA_SITE_KEY;
 export const appCheck = initializeAppCheck(app, {
-  provider: new ReCaptchaV3Provider(recaptchaSiteKey || '6LeSzZAqAAAAAOaGsXNfNwXvaOv15ZCcwc7jdeET'),
+  provider: new ReCaptchaV3Provider(recaptchaSiteKey || '6LdNECguAAAAACQAq8_NgurKzrqyKXESXoNC0blV'),
   isTokenAutoRefreshEnabled: true,
 });
 

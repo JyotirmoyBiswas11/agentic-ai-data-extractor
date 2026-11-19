@@ -1,0 +1,21 @@
+OrderID,OrderDate,CustomerName,Region,ProductLine,Quantity,UnitPrice,Revenue,Status
+ORD-1001,2024-01-15,Acme Corp,North America,Enterprise Cloud,5,1200,6000,Completed
+ORD-1002,2024-01-18,Starlight Tech,Europe,Analytics Pro,12,350,4200,Completed
+ORD-1003,2024-01-22,Apex Logistics,Asia Pacific,Starter Suite,20,150,3000,Completed
+ORD-1004,2024-01-28,Nexus Labs,North America,Enterprise Cloud,2,1200,2400,Pending
+ORD-1005,2024-02-03,Kartenliebe Retail,Europe,Design Studio,15,450,6750,Completed
+ORD-1006,2024-02-09,One Data Systems,Europe,Enterprise Cloud,8,1200,9600,Completed
+ORD-1007,2024-02-14,BlueWave Media,Latin America,Analytics Pro,10,350,3500,Completed
+ORD-1008,2024-02-21,Zenith Health,North America,Compliance Shield,6,800,4800,Completed
+ORD-1009,2024-02-27,Quantum Dynamics,Asia Pacific,Enterprise Cloud,4,1200,4800,Refunded
+ORD-1010,2024-03-05,Silverline Capital,North America,Analytics Pro,18,350,6300,Completed
+ORD-1011,2024-03-12,Horizon Energy,Europe,Starter Suite,25,150,3750,Completed
+ORD-1012,2024-03-18,Optima Global,Asia Pacific,Design Studio,9,450,4050,Completed
+ORD-1013,2024-03-24,Pulse Biotech,North America,Compliance Shield,14,800,11200,Completed
+ORD-1014,2024-03-30,Vanguard Media,Europe,Analytics Pro,7,350,2450,Completed
+ORD-1015,2024-04-04,Summit Financial,North America,Enterprise Cloud,10,1200,12000,Completed
+ORD-1016,2024-04-11,Evergreen Retail,Latin America,Starter Suite,30,150,4500,Completed
+ORD-1017,2024-04-17,Nova Robotics,Asia Pacific,Enterprise Cloud,3,1200,3600,Completed
+ORD-1018,2024-04-23,Cascade Telecom,North America,Analytics Pro,16,350,5600,Completed
+ORD-1019,2024-04-29,Pioneer Software,Europe,Design Studio,11,450,4950,Completed
+ORD-1020,2024-05-06,AeroFlight Corp,North America,Compliance Shield,5,800,4000,Completed
