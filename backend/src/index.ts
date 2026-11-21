@@ -85,6 +85,9 @@ initFirebase();
 
 const app = express();
 
+// Trust reverse proxy headers (required on Render, Cloud Run, Heroku for rate-limiting by client IP)
+app.set('trust proxy', 1);
+
 // Security headers
 app.use(helmet());
 
