@@ -39,10 +39,8 @@ export const AppShell: React.FC = () => {
 
           {/* Footer Signature */}
           <footer className="mt-12 pt-6 border-t border-[var(--border)] text-center text-xs text-[var(--muted-foreground)]">
-            <p className="flex items-center justify-center gap-1.5 font-medium">
-              <span>DataLens AI </span>
-              <span>by</span>
-              <span className="font-semibold text-[var(--text)] tracking-wide">Jyotirmoy</span>
+            <p className="font-semibold text-sm text-[var(--text)]">
+              DataLens <span className="text-[var(--primary)] font-bold">by Jyotirmoy</span>
             </p>
           </footer>
         </main>

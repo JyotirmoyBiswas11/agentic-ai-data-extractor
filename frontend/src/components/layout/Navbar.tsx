@@ -17,12 +17,12 @@ export const Navbar: React.FC = () => {
         >
           <Menu className="w-5 h-5" />
         </button>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2.5">
           <span className="font-heading font-bold text-lg tracking-tight bg-gradient-to-r from-[var(--primary)] via-[var(--accent)] to-[var(--primary)] bg-clip-text text-transparent">
-            DataLens AI
+            DataLens
           </span>
-          <span className="text-[10px] uppercase font-semibold tracking-wider px-2 py-0.5 rounded-full bg-[var(--primary)]/10 text-[var(--primary)] border border-[var(--primary)]/20">
-            SaaS v1.0
+          <span className="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-[var(--primary)]/10 text-[var(--primary)] border border-[var(--primary)]/20 tracking-wide">
+            by Jyotirmoy
           </span>
         </div>
       </div>

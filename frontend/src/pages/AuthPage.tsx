@@ -29,7 +29,7 @@ export const AuthPage: React.FC = () => {
           </div>
           <div>
             <h1 className="font-heading font-bold text-xl tracking-tight text-[var(--text)]">
-              DataLens AI
+              DataLens <span className="text-sm font-semibold text-[var(--primary)]">by Jyotirmoy</span>
             </h1>
             <p className="text-[11px] text-[var(--muted-foreground)] tracking-wide uppercase font-medium">
               Agentic Data Value Extractor
@@ -109,8 +109,8 @@ export const AuthPage: React.FC = () => {
             )}
           </div>
 
-          <p className="text-center text-xs text-[var(--muted-foreground)]">
-          by <span className="font-semibold text-[var(--text)]">Jyotirmoy</span>
+          <p className="text-center text-xs font-semibold text-[var(--text)]">
+            DataLens <span className="text-[var(--primary)] font-bold">by Jyotirmoy</span>
           </p>
         </div>
       </div>
