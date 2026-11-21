@@ -1,7 +1,6 @@
 {
   "projects": {
-    "default": "my-projects-2562a"
-  },
-  "targets": {},
-  "etags": {}
+    "default": "my-projects-2562a",
+    "main": "my-projects-2562a"
+  }
 }

@@ -1,5 +1,6 @@
 {
   "projects": {
-    "default": "my-projects-2562a"
+    "default": "my-projects-2562a",
+    "main": "my-projects-2562a"
   }
 }
