@@ -32,10 +32,19 @@ export const AppShell: React.FC = () => {
       <Navbar />
       <div className="flex-1 flex overflow-hidden">
         <Sidebar />
-        <main className="flex-1 overflow-y-auto p-6 md:p-8">
-          <div className="max-w-7xl mx-auto">
+        <main className="flex-1 overflow-y-auto p-6 md:p-8 flex flex-col justify-between">
+          <div className="max-w-7xl mx-auto w-full flex-1">
             <Outlet />
           </div>
+
+          {/* Footer Signature */}
+          <footer className="mt-12 pt-6 border-t border-[var(--border)] text-center text-xs text-[var(--muted-foreground)]">
+            <p className="flex items-center justify-center gap-1.5 font-medium">
+              <span>DataLens AI </span>
+              <span>by</span>
+              <span className="font-semibold text-[var(--text)] tracking-wide">Jyotirmoy</span>
+            </p>
+          </footer>
         </main>
       </div>
     </div>

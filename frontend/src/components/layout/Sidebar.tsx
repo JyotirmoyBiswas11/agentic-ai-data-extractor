@@ -48,6 +48,19 @@ export const Sidebar: React.FC = () => {
           })}
         </nav>
       </div>
+
+      {/* Creator Branding */}
+      <div className="p-4 border-t border-[var(--border)]">
+        <div className="p-2.5 rounded-xl bg-[var(--secondary)]/40 border border-[var(--border)] flex items-center justify-between">
+          <div className="space-y-0.5">
+            <p className="text-[10px] text-[var(--muted-foreground)] uppercase tracking-wider font-semibold">Creator</p>
+            <p className="text-xs font-semibold text-[var(--text)]">Jyotirmoy</p>
+          </div>
+          <span className="text-[10px] px-2 py-0.5 rounded-full bg-[var(--primary)]/10 text-[var(--primary)] font-mono font-medium">
+            v1.0
+          </span>
+        </div>
+      </div>
     </aside>
   );
 };

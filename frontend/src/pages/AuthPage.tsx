@@ -108,6 +108,10 @@ export const AuthPage: React.FC = () => {
               />
             )}
           </div>
+
+          <p className="text-center text-xs text-[var(--muted-foreground)]">
+          by <span className="font-semibold text-[var(--text)]">Jyotirmoy</span>
+          </p>
         </div>
       </div>
     </div>
