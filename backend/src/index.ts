@@ -88,13 +88,17 @@ const app = express();
 // Security headers
 app.use(helmet());
 
-// CORS — whitelist the frontend origins
+// CORS — whitelist the frontend origins (both local development and production hosting)
 const projectId = process.env['FIREBASE_PROJECT_ID'] ?? 'my-projects-2562a';
-const allowedOrigins = new Set([
-  process.env['FRONTEND_ORIGIN'] ?? 'http://localhost:5173',
-  `https://${projectId}.web.app`,
-  `https://${projectId}.firebaseapp.com`,
-]);
+const allowedOrigins = new Set(
+  [
+    'http://localhost:5173',
+    'http://localhost:3000',
+    process.env['FRONTEND_ORIGIN'],
+    `https://${projectId}.web.app`,
+    `https://${projectId}.firebaseapp.com`,
+  ].filter(Boolean),
+);
 
 app.use(
   cors({
