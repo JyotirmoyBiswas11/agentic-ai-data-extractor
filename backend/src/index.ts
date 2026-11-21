@@ -99,13 +99,9 @@ const allowedOrigins = new Set([
 app.use(
   cors({
     origin: (origin, callback) => {
-      // Allow server-to-server requests (no Origin header) only in dev
+      // Allow requests with no origin (direct browser visits, curl, server-to-server, uptime probes)
       if (!origin) {
-        if (process.env['NODE_ENV'] !== 'production') {
-          callback(null, true);
-        } else {
-          callback(new Error('CORS: Origin header required in production.'));
-        }
+        callback(null, true);
         return;
       }
       if (allowedOrigins.has(origin)) {
@@ -122,6 +118,16 @@ app.use(
 app.use(express.json({ limit: '1mb' }));
 
 // ─── Routes ───────────────────────────────────────────────────────────────
+
+// Root endpoint for status verification and browser visits
+app.get('/', (_req, res) => {
+  res.json({
+    status: 'online',
+    service: 'DataLens AI Backend',
+    version: '1.0.0',
+    message: 'API is running successfully.',
+  });
+});
 
 // Health check — no rate limiting, no auth
 app.use('/health', healthRouter);
